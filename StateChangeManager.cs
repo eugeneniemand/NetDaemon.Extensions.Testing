@@ -1,6 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Text.Json;
 using NetDaemon.HassModel.Entities;
+using Stateless.Graph;
 
 namespace NetDaemon.Extensions.Testing;
 
@@ -49,7 +51,45 @@ public class StateChangeManager(IHaContext haContextMock, TestScheduler testSche
         ( (HaContextMockImpl)haContextMock ).TriggerStateChange(entity, oldState, newState);
         return this;
     }
-    
+
+    public StateChangeManager Change(Entity entity, Dictionary<string, object> attributes)
+    {
+        var entityState = new EntityState
+        {
+            EntityId = entity.EntityId,
+            State = "off",
+            AttributesJson = ToAttributeJson(attributes)
+        };
+
+        // Arrange
+        return Change(entity, entityState);
+        
+    }
+    public StateChangeManager Change(Entity entity, object? attributes)
+    {
+        
+        var entityState = new EntityState
+        {
+            EntityId = entity.EntityId,
+            State = "off",
+            AttributesJson = ToAttributeJson(attributes)
+        };
+
+        // Arrange
+        return Change(entity, entityState);
+
+    }
+
+
     public StateChangeManager Change(NumericSensorEntity entity, double newStatevalue, object? attributes = null) =>
         Change(entity, newStatevalue.ToString(CultureInfo.InvariantCulture), attributes);
+
+    public static JsonElement ToAttributeJson(object? attributes)
+    {
+        // Serialize the dictionary to a JSON string
+        var attributesJsonString = JsonSerializer.Serialize(attributes);
+
+        // Parse the JSON string into a JsonElement
+        return JsonSerializer.Deserialize<JsonElement>(attributesJsonString);
+    }
 }

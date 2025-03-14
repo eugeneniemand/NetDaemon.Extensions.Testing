@@ -27,7 +27,14 @@ public static class TestExtensions
     
     public static ReadOnlyCollection<TestServiceCall> Filter(this IEnumerable<TestServiceCall> collection, Domain domain) => 
         new ( collection.Where(s => string.Equals(s.Domain, domain.ToString(), StringComparison.InvariantCultureIgnoreCase)).ToList());
-    
+
+    public static ReadOnlyCollection<TestServiceCall> Filter(this IEnumerable<TestServiceCall> collection, IEnumerable<Domain> domains) =>
+        new(collection.Where(s => domains.Any(d => string.Equals(s.Domain, d.ToString(), StringComparison.InvariantCultureIgnoreCase))).ToList());
+
+    public static ReadOnlyCollection<TestServiceCall> Filter(this IEnumerable<TestServiceCall> collection, Domain domain, string service) =>
+        new(collection.Where(s => string.Equals(s.Domain, domain.ToString(), StringComparison.InvariantCultureIgnoreCase) 
+        && string.Equals(s.Service, service, StringComparison.InvariantCultureIgnoreCase)).ToList());
+
     public static ReadOnlyCollection<TestServiceCall> Filter(this IEnumerable<TestServiceCall> collection, string service) => 
         new ( collection.Where(s => string.Equals(s.Service, service, StringComparison.InvariantCultureIgnoreCase)).ToList());
     
@@ -37,5 +44,6 @@ public enum Domain
 {
     Light,
     Switch,
-    Notify
+    Notify,
+    Logbook
 }

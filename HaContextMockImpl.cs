@@ -7,9 +7,9 @@ namespace NetDaemon.Extensions.Testing;
 
 public class HaContextMockImpl : IHaContext
 {
-    private readonly List<TestServiceCall> _serviceCalls = new();
+    private readonly List<TestServiceCall> _serviceCalls = [];
 
-    public Dictionary<string, EntityState> EntityStates { get; } = new();
+    public Dictionary<string, EntityState> EntityStates { get; } = [];
     public ReadOnlyCollection<TestServiceCall> ServiceCalls => new(_serviceCalls);
     public Subject<Event> EventsSubject { get; } = new();
     public Subject<StateChange> StateAllChangeSubject { get; } = new();
@@ -59,6 +59,11 @@ public class HaContextMockImpl : IHaContext
     {
         EntityStates[entity.EntityId] = newState;
         StateAllChangeSubject.OnNext(new StateChange(new Entity(this, entity.EntityId), oldState, newState));
+    }
+
+    EntityRegistration? IHaContext.GetEntityRegistration(string entityId)
+    {
+        throw new NotImplementedException();
     }
 }
 
